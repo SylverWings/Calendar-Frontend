@@ -1,4 +1,5 @@
 import { useDispatch } from 'react-redux';
+import { useAuthStore } from '../../hooks/useAuthStore';
 import { useForm } from '../../hooks/useForm';
 import './LoginPage.css';
 
@@ -17,19 +18,20 @@ const registerFormFields = {
 
 export const LoginPage = () => {
 
+
+    const { startLogin } = useAuthStore();
     const {loginEmail, loginpassword, onInputChange: onLoginInputChange} = useForm(loginFormFields)
     const {registerName, registerEmail, registerPassword, registerPassword2, onInputChange: onRegisterInputChange} = useForm(registerFormFields)
 
-    const dispatch = useDispatch();
 
     const loginSubmit = (event) =>{
         event.preventDefault();
-        dispatch()
+        startLogin({ email: loginEmail, password: loginpassword})
     }
 
     const registerSubmit = (event) =>{
         event.preventDefault();
-        dispatch();
+        
     }
 
     return (
@@ -37,7 +39,7 @@ export const LoginPage = () => {
             <div className="row">
                 <div className="col-md-6 login-form-1">
                     <h3>Ingreso</h3>
-                    <form>
+                    <form onSubmit={loginSubmit}>
                         <div className="form-group mb-2">
                             <input 
                                 type="text"
@@ -70,7 +72,7 @@ export const LoginPage = () => {
 
                 <div className="col-md-6 login-form-2">
                     <h3>Registro</h3>
-                    <form>
+                    <form onSubmit={registerSubmit}>
                         <div className="form-group mb-2">
                             <input
                                 type="text"
