@@ -9,7 +9,7 @@ export const AppRouter = () => {
     return (
         <Routes>
             {
-                (authSatatus !== 'not-authenticated') 
+                (authSatatus === 'not-authenticated') 
                 ?<Route path="/auth/*" element={ <LoginPage />} />
                 :<Route path="/*" element={ <HomePage />} />
             }
