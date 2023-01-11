@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux"
 import calendarApi from "../api/calendarApi";
-
+import {clearErrorMessage, onChecking, onLogin, onLogout} from "../store/auth/authSlice"
 
 export const useAuthStore = () => {
     
@@ -9,19 +9,30 @@ export const useAuthStore = () => {
     
     const startLogin = async({email, password})=>{
 
+        dispatch( onChecking() )
         try {
             
-            const resp = await calendarApi.post('/auth', {email, password});
-
-            console.log(resp)
-        } catch (error) {
-            console.log({
-                success: false,
-                message: 'Error al hacer el login',
-                errorMessage: error?.message || error
-            })
+            const {data} = await calendarApi.post('/auth', {email, password});
             
+            localStorage.setItem('token', data.token)
+            localStorage.setItem('token-init-date', new Date().getTime());
+
+            dispatch(onLogin({name: data.name, id: data.id}))
+
+        } catch (error) {
+            
+            dispatch(onLogout('Credenciales incorrectas'))
+            setTimeout(() => {
+                dispatch( clearErrorMessage() )
+            }, 10);            
         }
+    };
+
+    const startLogout = ()=>{
+        dispatch(onLogout('Hasta la proxima'))
+        setTimeout(() => {
+            dispatch( clearErrorMessage() )
+        }, 10);
     }
     
     return{
@@ -31,5 +42,6 @@ export const useAuthStore = () => {
         errorMessage,
         //*Métodos
         startLogin,
+        startLogout,
     }
 }
