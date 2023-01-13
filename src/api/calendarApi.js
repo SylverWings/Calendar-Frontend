@@ -10,13 +10,15 @@ const calendarApi = axios.create({
 
 calendarApi.interceptors.request.use(config=> {
 
-    const token = JSON.parse(localStorage.getItem("token"))
-
+    const token = localStorage.getItem('token')
     config.headers ={
         ...config.headers,
-        authorization: `Bearer ${token?.accessToken}`
+        Authorization: `Bearer ${token}`
+
     }
 
     return config
 })
+
+
 export default calendarApi;
