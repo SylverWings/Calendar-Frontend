@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux"
 import calendarApi from "../api/calendarApi";
-import { onAddNewEvent, onDeleteEvent, onSetActiveEvent, onUpdateEvent } from "../store";
+import {convertEventsToDateEvents} from "../helpers";
+import { onAddNewEvent, onDeleteEvent, onLoadEvents, onSetActiveEvent, onUpdateEvent } from "../store";
 
 
 export const useCalendarStore = () => {
@@ -10,14 +11,14 @@ export const useCalendarStore = () => {
     const { events, activeEvent } = useSelector( state => state.calendar );
     const { user } = useSelector( state => state.auth );
 
+
     const setActiveEvent = ( calendarEvent ) =>{
 
         dispatch( onSetActiveEvent( calendarEvent ) )
     }
 
+
     const startSavingEvent = async( calendarEvent ) =>{
-
-
 
         if( calendarEvent.id ){
             //Actualizando
@@ -25,14 +26,30 @@ export const useCalendarStore = () => {
         } else {
             //Creando
             const { data } = await calendarApi.post('/event', calendarEvent)
-            console.log({data})
-            dispatch( onAddNewEvent( {...calendarEvent, id: data.event.id, user} ) )
+            dispatch( onAddNewEvent( {...calendarEvent, id: data.event.id, userId: user} ) )
         }
     }
+
 
     const startDeleteEvent = ( calendarEvent ) =>{
 
         dispatch( onDeleteEvent() )
+    }
+
+
+    const startLoadingEvents = async() =>{
+
+        try {
+            const {data} = await calendarApi.get('/event');
+            const events = convertEventsToDateEvents(data.data);
+            dispatch(onLoadEvents(events))
+
+        } catch (error) {
+            console.log({
+                success: false,
+                message: error
+            })
+        }
     }
 
     return {
@@ -44,5 +61,6 @@ export const useCalendarStore = () => {
         setActiveEvent,
         startSavingEvent,
         startDeleteEvent,
+        startLoadingEvents,
     }
 }
